@@ -4,6 +4,9 @@ import IC.TestSuite hiding (Id)
 import qualified IC.TestSuite as TS
 import Calculus
 
+instance Reformat Exp where
+  reformat = reformat . TS.Id
+
 evalTests
   = [ ((Val 7),  [("x",380)])
         ==> 7.0
@@ -49,6 +52,15 @@ evalTests
 
     , ( e6, [("x",0.37)])
         ==> 0.8799171617597958
+    ]
+
+showExpTests
+  = 
+    [ (BinApp Add (Val 1.0) (UnApp Log (Id "x"))) ==>
+        "(1.0+log(x))"
+        
+    , (BinApp Mul (Val 4.0) (BinApp Add (Id "x") (UnApp Neg (Id "y")))) ==>
+        "(4.0*(x+-(y)))"
     ]
 
 diffTests
@@ -105,7 +117,7 @@ allTestCases
   = [ floatTestCase "eval"       (uncurry eval)       evalTests
     , testCase "diff"       (uncurry diff)       diffTests
     , floatTestCase "maclaurin"  (uncurry3 maclaurin) maclaurinTests
-    ]
+    , testCase "showExp" showExp showExpTests]
 
 runTests = mapM_ goTest allTestCases
 
